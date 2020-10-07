@@ -86,14 +86,24 @@ QGeoTiledMapReply *QGeoTileFetcherMapbox::getTileImage(const QGeoTileSpec &spec)
     QNetworkRequest request;
     request.setRawHeader("User-Agent", m_userAgent);
 
-    request.setUrl(QUrl(QStringLiteral("http://api.tiles.mapbox.com/v4/") +
-                        ((spec.mapId() >= m_mapIds.size()) ? QStringLiteral("mapbox.streets") : m_mapIds[spec.mapId() - 1]) + QLatin1Char('/') +
-                        QString::number(spec.zoom()) + QLatin1Char('/') +
-                        QString::number(spec.x()) + QLatin1Char('/') +
-                        QString::number(spec.y()) +
-                        ((m_scaleFactor > 1) ? (QLatin1Char('@') + QString::number(m_scaleFactor) + QLatin1String("x.")) : QLatin1String(".")) +
-                        m_format + QLatin1Char('?') +
-                        QStringLiteral("access_token=") + m_accessToken));
+    // Since June 20, the classic style has been deprecated.
+    // Modern style should be used, there are few styles availables for all accounts:
+    // https://docs.mapbox.com/api/maps/#mapbox-styles
+    // Using `mapbox/streets-v11` style here, it's hardcoded.
+    // Also API base URL must be changed:
+    // Before: https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}{@2x}.png?access_token={accessToken}
+    // After: https://api.mapbox.com/styles/v1/{id}/tiles/{tilesize}/{z}/{x}/{y}{@2x}?access_token={accessToken}
+
+    QString urlString = QString("https://api.mapbox.com/styles/v1/mapbox/%1/tiles/%2/%3/%4/%5%6?access_token=%7")
+            .arg(spec.mapId() >= m_mapIds.size() ? QStringLiteral("streets-v11") : m_mapIds[spec.mapId() - 1])
+            .arg(512)
+            .arg(spec.zoom())
+            .arg(spec.x())
+            .arg(spec.y())
+            .arg(m_scaleFactor > 1 ? QString("@%1x").arg(m_scaleFactor) : QLatin1String(""))
+            .arg(m_accessToken);
+
+    request.setUrl(urlString);
 
     QNetworkReply *reply = m_networkManager->get(request);
 

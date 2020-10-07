@@ -74,7 +74,7 @@ QGeoTiledMappingManagerEngineMapbox::QGeoTiledMappingManagerEngineMapbox(const Q
 
     // As of 2016.06.15, valid mapbox map_ids are documented at https://www.mapbox.com/api-documentation/#maps
     //: Noun describing map type 'Street map'
-    mapTypes << QGeoMapType(QGeoMapType::StreetMap, QStringLiteral("mapbox.streets"), tr("Street"), false, false, mapTypes.size() + 1, pluginName);
+    mapTypes << QGeoMapType(QGeoMapType::StreetMap, QStringLiteral("streets-v11"), tr("Street"), false, false, mapTypes.size() + 1, pluginName);
     //: Noun describing type of a map using light colors (weak contrast)
     mapTypes << QGeoMapType(QGeoMapType::StreetMap, QStringLiteral("mapbox.light"), tr("Light"), false, false, mapTypes.size() + 1, pluginName);
     //: Noun describing type of a map using dark colors
