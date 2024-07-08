@@ -1,55 +1,10 @@
-/****************************************************************************
-**
-** Copyright (C) 2017 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the examples of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:BSD$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** BSD License Usage
-** Alternatively, you may use this file under the terms of the BSD license
-** as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of The Qt Company Ltd nor the names of its
-**     contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
+// Copyright (C) 2017 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-import QtQuick 2.4
-import QtLocation 5.6
+import QtQuick
+import QtLocation
+import QtQuick.Shapes
+
 
 //! [PlaneMapQuick1]
 // Plane.qml
@@ -61,54 +16,84 @@ MapQuickItem {
     anchorPoint.x: image.width/2
     anchorPoint.y: image.height/2
 
-    sourceItem: Grid {
+    sourceItem: Item {
         //...
 //! [PlaneMapQuick1]
-        columns: 1
-        Grid {
-            horizontalItemAlignment: Grid.AlignHCenter
-            Image {
-                id: image
-                rotation: bearing
-                source: "airplane.png"
-            }
-            Rectangle {
-                id: bubble
-                color: "lightblue"
-                border.width: 1
-                width: text.width * 1.3
-                height: text.height * 1.3
-                radius: 5
-                Text {
-                    id: text
-                    anchors.centerIn: parent
-                    text: pilotName
+        width: childrenRect.width
+        height: childrenRect.height
+        Image {
+            id: image
+            rotation: bearing
+            source: "airplane.svg"
+        }
+        Shape {
+            id: bubble
+            anchors.bottom: image.top
+            anchors.margins: 3
+            opacity: 0.8
+            preferredRendererType: Shape.CurveRenderer
+            ShapePath {
+                strokeWidth: 0
+                strokeColor: "#00414A"
+                fillGradient: LinearGradient {
+                    x1: 0; y1: 0
+                    x2: 10 + text.width; y2: 10 + text.height
+                    GradientStop { position: 0; color: "#00414A" }
+                    GradientStop { position: 1; color: "#0C1C1F" }
                 }
+                startX: 5; startY: 0
+                PathLine { x: 5 + text.width + 6; y: 0 }
+                PathArc { x: 10 + text.width + 6; y: 5; radiusX: 5; radiusY: 5}
+                PathLine { x: 10 + text.width + 6; y: 5 + text.height + 6 }
+                PathArc { x: 5 + text.width + 6; y: 10 + text.height + 6 ; radiusX: 5; radiusY: 5}
+                // arrow down
+                PathLine { x: 10 + text.width / 2 + 3; y: 10 + text.height + 6 }
+                PathLine { x: 5 + text.width / 2 + 3; y: 15 + text.height + 6 }
+                PathLine { x: 0 + text.width / 2 + 3; y: 10 + text.height + 6 }
+                // end arrow down
+                PathLine { x: 5; y: 10 + text.height + 6 }
+                PathArc { x: 0; y: 5 + text.height + 6 ; radiusX: 5; radiusY: 5}
+                PathLine { x: 0; y: 5 }
+                PathArc { x: 5; y: 0 ; radiusX: 5; radiusY: 5}
+            }
+            Text {
+                id: text
+                color: "white"
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.margins: 8
+                text: pilotName
+                font.bold: true
             }
         }
 
         Rectangle {
             id: message
-            color: "lightblue"
-            border.width: 1
-            width: banner.width * 1.3
-            height: banner.height * 1.3
+            anchors.left: image.right
+            anchors.margins: 3
+            opacity: 0.0
             radius: 5
-            opacity: 0
+            border.width: 0
+            color: "#E6E6E6"
+            width: banner.width + 30
+            height: banner.height + 20
             Text {
                 id: banner
+                color: "#00414A"
                 anchors.centerIn: parent
+                font.bold: true
             }
+
             SequentialAnimation {
                 id: playMessage
                 running: false
                 NumberAnimation { target: message;
                     property: "opacity";
-                    to: 1.0;
+                    to: 1;
                     duration: 200
                     easing.type: Easing.InOutQuad
                 }
-                PauseAnimation  { duration: 1000 }
+                PauseAnimation  { duration: 3000 }
                 NumberAnimation { target: message;
                     property: "opacity";
                     to: 0.0;
